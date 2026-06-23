@@ -1,46 +1,108 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../config/supabase';
 
 const SelectCompany = () => {
+
   const navigate = useNavigate();
-  const companies = JSON.parse(localStorage.getItem('allCompanies')) || [];
+  const [companies, setCompanies] = useState([]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = async () => {
+
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*');
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setCompanies(data);
+  };
+
 
   const handleSelect = (company) => {
-    localStorage.setItem('createdCompany', JSON.stringify(company));
+
+    localStorage.setItem(
+      'createdCompany',
+      JSON.stringify(company)
+    );
+
     navigate('/dashboard');
+
   };
 
-  const handleDelete = (index) => {
-    const updated = companies.filter((_, i) => i !== index);
-    localStorage.setItem('allCompanies', JSON.stringify(updated));
-    if (updated.length > 0) {
-      localStorage.setItem('createdCompany', JSON.stringify(updated[0]));
-    } else {
-      localStorage.removeItem('createdCompany');
-    }
-    window.location.reload();
-  };
 
   return (
+
     <div style={{ padding: '40px' }}>
-      <h2>Select a Company</h2>
+
+      <h2>Select Company</h2>
+
+
       {companies.length === 0 ? (
-        <p>No companies created yet.</p>
+
+        <p>No companies found.</p>
+
       ) : (
+
         <ul>
-          {companies.map((c, i) => (
-            <li key={i} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '15px' }}>
-              <b>{c.name}</b> ({c.country})<br />
-              {c.logo && <img src={c.logo} alt="Logo" style={{ width: '60px', marginTop: '5px' }} />}<br />
-              <button onClick={() => handleSelect(c)}>Load</button>
-              <button onClick={() => handleDelete(i)} style={{ marginLeft: '10px', color: 'red' }}>Delete</button>
+
+          {companies.map((company) => (
+
+            <li
+              key={company.id}
+              style={{
+                marginBottom: '20px',
+                border: '1px solid #ccc',
+                padding: '15px'
+              }}
+            >
+
+              <b>{company.name}</b>
+
+              <br />
+
+              Type : {company.company_type}
+
+              <br />
+
+              Country : {company.country}
+
+              <br /><br />
+
+              <button
+                onClick={() => handleSelect(company)}
+              >
+                Load
+              </button>
+
             </li>
+
           ))}
+
         </ul>
+
       )}
-      <button onClick={() => navigate('/create-company')} style={{ marginTop: '20px' }}>Create New Company</button>
+
+
+      <button
+        onClick={() => navigate('/create-company')}
+        style={{ marginTop: '20px' }}
+      >
+        Create New Company
+      </button>
+
+
     </div>
+
   );
+
 };
 
 export default SelectCompany;

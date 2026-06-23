@@ -1,5 +1,7 @@
 // src/App.js
-import React from 'react';
+
+import React, { useEffect } from 'react';
+import { supabase } from './config/supabase';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import LayoutContainer from './components/LayoutContainer';
@@ -25,45 +27,78 @@ import Reports from './components/Reports';
 import RatioAnalysis from './components/RatioAnalysis';
 import AnalysisVerification from './components/AnalysisVerification';
 import VoucherPrint from './components/VoucherPrint';
-import BillingPage from './components/BillingPage'; // You’ll get this file next if not added yet
-
-
+import BillingPage from './components/BillingPage';
 
 function App() {
+
+  useEffect(() => {
+
+    const fetchUsers = async () => {
+
+      const response = await supabase
+        .from('users')
+        .select('*');
+
+      console.log("FULL RESPONSE:");
+      console.log(response);
+
+    };
+
+    fetchUsers();
+
+  }, []);
+
   return (
+
     <div style={{ backgroundColor: '#FFF8DC', height: '100vh' }}>
+
       <Router>
+
         <Routes>
+
           <Route path="/" element={<LayoutContainer />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/gst" element={<GSTSettings />} />
           <Route path="/ledger" element={<LedgerPage />} />
           <Route path="/vouchers" element={<Vouchers />} />
+
           <Route path="/create-company" element={<CreateCompany />} />
           <Route path="/select-company" element={<SelectCompany />} />
+
           <Route path="/accounts" element={<AccountsInfo />} />
           <Route path="/ledger-create" element={<LedgerCreate />} />
+
           <Route path="/inventory" element={<InventoryInfo />} />
           <Route path="/stock-create" element={<StockItemCreate />} />
           <Route path="/inventory-voucher-create" element={<InventoryVoucherCreate />} />
           <Route path="/inventory-display" element={<InventoryDisplay />} />
+
           <Route path="/voucher-type-create" element={<VoucherTypeCreate />} />
           <Route path="/display-vouchers" element={<DisplayVoucher />} />
+
           <Route path="/voucher-entry" element={<VoucherEntry />} />
           <Route path="/voucher-list" element={<VoucherList />} />
+
           <Route path="/display" element={<Display />} />
+
           <Route path="/reports" element={<Reports />} />
+
           <Route path="/ratio-analysis" element={<RatioAnalysis />} />
           <Route path="/analysis-verification" element={<AnalysisVerification />} />
+
           <Route path="/voucher-print" element={<VoucherPrint />} />
+
           <Route path="/billing" element={<BillingPage />} />
-   
-         
+
         </Routes>
+
       </Router>
+
     </div>
+
   );
+
 }
 
 export default App;

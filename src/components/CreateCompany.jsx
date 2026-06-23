@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/createCompany.css';
+import { supabase } from '../config/supabase';
 
 const CreateCompany = () => {
   const navigate = useNavigate();
@@ -56,11 +57,44 @@ const CreateCompany = () => {
     if (file) reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    localStorage.setItem('createdCompany', JSON.stringify(formData));
-    navigate('/dashboard');
-  };
+  const handleSubmit = async (e) => {
+
+  e.preventDefault();
+
+ const { data, error } = await supabase
+.from('companies')
+.insert([
+{
+name: formData.name,
+company_type: formData.companyType,
+about: formData.about,
+address: formData.address,
+country: formData.country,
+email: formData.email,
+phone: formData.phone,
+currency: formData.currency,
+decimals: Number(formData.decimals)
+}
+])
+.select();
+  if (error) {
+   console.log("Supabase Error:", error);
+    alert("Failed to save company");
+    return;
+  }
+
+  console.log("Company Saved:", data);
+
+  localStorage.setItem(
+    'createdCompany',
+    JSON.stringify(formData)
+  );
+
+  alert("Company Saved to Supabase");
+
+  navigate('/dashboard');
+
+};
 
   // Move focus to next field with Enter
   const handleKeyNav = (e, nextRefName) => {

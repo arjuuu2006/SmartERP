@@ -1,3 +1,4 @@
+import { supabase } from '../config/supabase';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/dashboard.css';
@@ -47,10 +48,41 @@ const Dashboard = () => {
     setFlatMenu(flat);
   }, []);
 
-  useEffect(() => {
-    const savedCompany = JSON.parse(localStorage.getItem('createdCompany'));
-    setCompany(savedCompany || null);
-  }, []);
+ useEffect(() => {
+
+  const fetchCompany = async () => {
+
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .order('id', { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (data.length > 0) {
+
+      setCompany({
+        name: data[0].name,
+        companyType: data[0].company_type,
+        about: data[0].about,
+        address: data[0].address,
+        country: data[0].country,
+        email: data[0].email,
+        phone: data[0].phone,
+        currency: data[0].currency
+      });
+
+    }
+
+  };
+
+  fetchCompany();
+
+}, []);
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
